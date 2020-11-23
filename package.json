@@ -1,0 +1,33 @@
+{
+  "name": "@open-node/dm",
+  "version": "0.1.0",
+  "description": "Dependency Injection Manager for Node.js",
+  "main": "src/dm.js",
+  "scripts": {
+    "lint": "eslint ./src/*",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch src",
+    "release": "npm publish --registry=https://registry.npmjs.org --access=public",
+    "release:github": "npm publish --registry=https://npm.pkg.github.com/"
+  },
+  "pre-commit": ["lint", "test"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/open-node/dm.git"
+  },
+  "keywords": ["Dependency", "Manager"],
+  "author": "Redstone Zhao",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/open-node/dm/issues"
+  },
+  "homepage": "https://github.com/open-node/dm#readme",
+  "devDependencies": {
+    "eslint": "^7.14.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-react": "^7.21.5",
+    "jest": "^26.6.3"
+  }
+}
