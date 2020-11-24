@@ -124,15 +124,16 @@ function DM(ext = "js") {
    * @param Set<string> ignores 要忽略的名称集合
    * @param Object deps 执行后挂载的对象
    * @param Array args 模块初始化传递的参数列表
+   * @param Object parent 模块挂载的对象
    *
    * @return void
    */
-  const auto = (dir, ignores, deps, args) => {
+  const auto = (dir, ignores, deps, args, parent = deps) => {
     const modules = loadDir(dir, ignores);
     const names = sort(modules, new Set(Object.keys(deps)));
     const plugin = (name, main) => {
-      if (deps[name]) throw Error(`Name ${name} duplicate`);
-      deps[name] = main;
+      if (parent[name]) throw Error(`Name ${name} duplicate`);
+      parent[name] = main;
     };
     for (const x of names) {
       const { Alias } = modules[x];
