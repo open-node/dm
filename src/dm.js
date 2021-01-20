@@ -133,7 +133,7 @@ function DM(ext = "js") {
   const auto = (dir, ignores, deps, args, parent = deps, defaults = {}) => {
     const modules = loadDir(dir, ignores);
     for (const name of Object.keys(defaults)) {
-      if (!modules[name]) throw Error(`Name ${name} exists already`);
+      if (modules[name]) throw Error(`Name ${name} exists already`);
       modules[name] = defaults[name];
     }
     const names = sort(modules, new Set(Object.keys(deps)));
