@@ -112,7 +112,8 @@ function DM(ext = "js") {
         if (Deps.every(d => exists.has(d))) addSorted(x);
       }
 
-      if (count === 0) throw Error(`Deps defined conflict, ${Array.from(names)}`);
+      if (count === 0)
+        throw Error(`Deps defined conflict, ${Array.from(names)}`);
     }
 
     return sorted;
@@ -125,11 +126,16 @@ function DM(ext = "js") {
    * @param Object deps 执行后挂载的对象
    * @param Array args 模块初始化传递的参数列表
    * @param Object parent 模块挂载的对象
+   * @param Object defaults 默认模块 { [name]: Main }
    *
    * @return void
    */
-  const auto = (dir, ignores, deps, args, parent = deps) => {
+  const auto = (dir, ignores, deps, args, parent = deps, defaults = {}) => {
     const modules = loadDir(dir, ignores);
+    for (const name of Object.keys(defaults)) {
+      if (!modules[name]) throw Error(`Name ${name} exists already`);
+      modules[name] = defaults[name];
+    }
     const names = sort(modules, new Set(Object.keys(deps)));
     const plugin = (name, main) => {
       if (parent[name]) throw Error(`Name ${name} duplicate`);
