@@ -1,4 +1,4 @@
-function Main(cnf, deps, _name, time) {
+function Main(cnf, deps) {
   if (!deps.two || !deps.three) throw Error("Lack two/three dependency");
 
   const sayHi = () => "hi from one";
@@ -7,6 +7,5 @@ function Main(cnf, deps, _name, time) {
 }
 
 Main.Deps = ["two", "three"];
-Main.Alias = ["_one", "1"];
 
 module.exports = Main;

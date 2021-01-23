@@ -5,6 +5,5 @@ function Main(cnf, deps, _name, time) {
 }
 
 Main.Deps = ["two"];
-Main.Alias = ["3"];
 
 module.exports = Main;

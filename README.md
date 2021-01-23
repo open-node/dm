@@ -9,11 +9,11 @@ Dependency Injection Manager for Node.js
 
 # Usage
 <pre>
-const dm = require('@open-node/dm');
+const _ = require('lodash');
+const DM = require('@open-node/dm');
 
-const DM = Logger({ errorLogPath, infoLogPath });
-const dm = DM('js');
+const dm = DM('js', _);
 
 const deps = {};
-dm.auto(dir, ignores, deps, args);
+dm.auto(dir, { ignores, deps, args });
 </pre>

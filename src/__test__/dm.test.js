@@ -91,10 +91,6 @@ describe("Dependency Injection Manager.", () => {
         args: [{}, deps]
       });
 
-      expect(deps.one).toBe(deps["1"]);
-      expect(deps._one).toBe(deps["1"]);
-      expect(deps.three).toBe(deps["3"]);
-
       expect(deps.one.sayHi()).toBe("hi from one");
       expect(deps.two.sayHi()).toBe("hi from two");
       expect(deps.three.sayHi()).toBe("hi from three");
@@ -121,7 +117,7 @@ describe("Dependency Injection Manager.", () => {
           deps,
           args: [{}, deps]
         });
-      }).toThrow("Name two duplicate");
+      }).toThrow("Deps defined conflict");
     });
 
     it("case4, add ignores", () => {
@@ -144,10 +140,6 @@ describe("Dependency Injection Manager.", () => {
         deps,
         args: [{}, deps]
       });
-
-      expect(deps.one).toBe(deps["1"]);
-      expect(deps._one).toBe(deps["1"]);
-      expect(deps.three).toBe(deps["3"]);
 
       expect(deps.one.sayHi()).toBe("hi from one");
       expect(deps.two.sayHi()).toBe("hi from two");

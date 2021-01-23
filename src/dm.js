@@ -77,54 +77,6 @@ function DM(ext = "js", _) {
   };
 
   /**
-   * 按照所需依赖排序
-   * @param Object 加载的模块对象 { [name]: Main }
-   * @param Array[string] deps 已经存在的依赖, 名称的数组 [name1, name2, name3]
-   *
-   * @return Array[string] 返回排序后的模块名列表 [name1, name2, ...]
-   */
-  const sort = (modules, deps) => {
-    // 这里会不断的写入已经排序好的模块名称，
-    // 为了判断更高效，也为了不污染 deps 数组
-    const exists = new Set(deps);
-
-    // 存放排序偶的模块名称
-    const sorted = [];
-
-    const names = new Set(Object.keys(modules));
-    while (names.size) {
-      // 记录此次迭代有多少个模块被排序了，如果某次迭代被排序的模块数量为0，
-      // 那就要抛出异常了，说明依赖指定有问题，永远都不可能排序完毕
-      let count = 0;
-      const addSorted = name => {
-        sorted.push(name);
-        exists.add(name);
-        names.delete(name);
-        count += 1;
-      };
-
-      for (const x of names) {
-        const { Deps } = modules[x];
-        if (!Array.isArray(Deps) || !Deps.length) {
-          addSorted(x);
-          continue;
-        }
-        if (Deps.every(d => exists.has(d))) addSorted(x);
-      }
-
-      if (count === 0)
-        throw Error(`Deps defined conflict, ${Array.from(names)}`);
-    }
-
-    return sorted;
-  };
-
-  /** 默认挂载函数 */
-  const plugin = (deps, name, main) => {
-    if (_.has(deps, name)) throw Error(`Name ${name} duplicate`);
-    _.set(deps, name, main);
-  };
-  /**
    * 全流程自动加载一个目录下的所有模块
    * @param String dir 要加载的目录
    * @param Set<string> opt.ignores 要忽略的名称集合
@@ -143,18 +95,37 @@ function DM(ext = "js", _) {
       if (modules[name]) throw Error(`Name ${name} exists already`);
       modules[name] = defaults[name];
     }
-    const names = sort(modules, new Set(Object.keys(deps)));
-    for (const x of names) {
-      const { Alias } = modules[x];
-      const main = exec(modules[x], args);
-      plugin(deps, x, main);
-      if (Array.isArray(Alias) && Alias.length) {
-        for (const as of Alias) plugin(deps, as, main);
+
+    // 获取全部即将初始化的模块名称，此时的 modules 是扁平的一级结构
+    const names = new Set(Object.keys(modules));
+    while (names.size) {
+      // 记录此次迭代有多少个模块被排序了，如果某次迭代被排序的模块数量为0，
+      // 那就要抛出异常了，说明依赖指定有问题，永远都不可能排序完毕
+      let count = 0;
+      /** 默认挂载函数 */
+      const plugin = (name) => {
+        const main = exec(modules[name], args);
+        if (_.has(deps, name)) throw Error(`Name ${name} duplicate`);
+        _.set(deps, name, main);
+        names.delete(name);
+        count += 1;
+      };
+
+      for (const x of names) {
+        const { Deps } = modules[x];
+        if (!Array.isArray(Deps) || !Deps.length) {
+          plugin(x);
+          continue;
+        }
+        if (Deps.every(d => _.has(deps, d))) plugin(x);
       }
+
+      if (count === 0)
+        throw Error(`Deps defined conflict, ${Array.from(names)}`);
     }
   };
 
-  return { load, loadDir, exec, sort, auto };
+  return { load, loadDir, exec, auto };
 }
 
 module.exports = DM;
