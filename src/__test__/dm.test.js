@@ -1,9 +1,10 @@
+const _ = require("lodash");
 const DM = require("../dm");
 
 describe("Dependency Injection Manager.", () => {
   describe("exec", () => {
     it("case1, no hooks", () => {
-      const dm = DM();
+      const dm = DM(undefined, _);
       const Main = jest.fn();
       Main.mockReturnValueOnce({
         sayHi() {
@@ -17,7 +18,7 @@ describe("Dependency Injection Manager.", () => {
     });
 
     it("case2, before hook only", () => {
-      const dm = DM();
+      const dm = DM("js", _);
       const Main = jest.fn();
       Main.Before = jest.fn();
       Main.mockReturnValueOnce({
@@ -37,7 +38,7 @@ describe("Dependency Injection Manager.", () => {
     });
 
     it("case3, after hook only", () => {
-      const dm = DM();
+      const dm = DM("js", _);
       const Main = jest.fn();
       Main.After = jest.fn();
       Main.mockReturnValueOnce({
@@ -56,7 +57,7 @@ describe("Dependency Injection Manager.", () => {
     });
 
     it("case4, before And after hook both exists", () => {
-      const dm = DM();
+      const dm = DM("js", _);
       const Main = jest.fn();
       Main.Before = jest.fn();
       Main.After = jest.fn();
@@ -82,9 +83,13 @@ describe("Dependency Injection Manager.", () => {
 
   describe("auto", () => {
     it("case1", () => {
-      const dm = DM();
+      const dm = DM("js", _);
       const deps = {};
-      dm.auto(`${__dirname}/../../samples/case1/`, new Set(), deps, [{}, deps]);
+      dm.auto(`${__dirname}/../../samples/case1/`, {
+        ignores: new Set(),
+        deps,
+        args: [{}, deps]
+      });
 
       expect(deps.one).toBe(deps["1"]);
       expect(deps._one).toBe(deps["1"]);
@@ -96,33 +101,49 @@ describe("Dependency Injection Manager.", () => {
     });
 
     it("case2-incorrect", () => {
-      const dm = DM();
+      const dm = DM("js", _);
       const deps = {};
       expect(() => {
-        dm.auto(`${__dirname}/../../samples/case2-incorrect/`, new Set(), deps, [{}, deps]);
+        dm.auto(`${__dirname}/../../samples/case2-incorrect/`, {
+          ignores: new Set(),
+          deps,
+          args: [{}, deps]
+        });
       }).toThrow("Deps defined conflict");
     });
 
     it("case3-incorrect", () => {
-      const dm = DM();
+      const dm = DM("js", _);
       const deps = {};
       expect(() => {
-        dm.auto(`${__dirname}/../../samples/case3-incorrect/`, new Set(), deps, [{}, deps]);
+        dm.auto(`${__dirname}/../../samples/case3-incorrect/`, {
+          ignores: new Set(),
+          deps,
+          args: [{}, deps]
+        });
       }).toThrow("Name two duplicate");
     });
 
     it("case4, add ignores", () => {
-      const dm = DM();
+      const dm = DM("js", _);
       const deps = {};
       expect(() => {
-        dm.auto(`${__dirname}/../../samples/case1/`, new Set(["two"]), deps, [{}, deps]);
+        dm.auto(`${__dirname}/../../samples/case1/`, {
+          ignores: new Set(["two"]),
+          deps,
+          args: [{}, deps]
+        });
       }).toThrow("Deps defined conflict");
     });
 
     it("case5, file will be ignored, module must be directory", () => {
-      const dm = DM();
+      const dm = DM("js", _);
       const deps = {};
-      dm.auto(`${__dirname}/../../samples/case4/`, undefined, deps, [{}, deps]);
+      dm.auto(`${__dirname}/../../samples/case4/`, {
+        ignores: undefined,
+        deps,
+        args: [{}, deps]
+      });
 
       expect(deps.one).toBe(deps["1"]);
       expect(deps._one).toBe(deps["1"]);
@@ -134,18 +155,26 @@ describe("Dependency Injection Manager.", () => {
     });
 
     it("case6, module must be funciton", () => {
-      const dm = DM();
+      const dm = DM("js", _);
       const deps = {};
       expect(() => {
-        dm.auto(`${__dirname}/../../samples/case5-incorrect/`, new Set(["two"]), deps, [{}, deps]);
+        dm.auto(`${__dirname}/../../samples/case5-incorrect/`, {
+          ignores: new Set(["two"]),
+          deps,
+          args: [{}, deps]
+        });
       }).toThrow("required isnt function");
     });
 
     it("case7, module hooks must be funciton", () => {
-      const dm = DM();
+      const dm = DM("js", _);
       const deps = {};
       expect(() => {
-        dm.auto(`${__dirname}/../../samples/case6-incorrect/`, new Set(["two"]), deps, [{}, deps]);
+        dm.auto(`${__dirname}/../../samples/case6-incorrect/`, {
+          ignores: new Set(["two"]),
+          deps,
+          args: [{}, deps]
+        });
       }).toThrow("required isnt function");
     });
   });

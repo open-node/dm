@@ -7,7 +7,7 @@ const path = require("path");
  *
  * @return Object dm
  */
-function DM(ext = "js") {
+function DM(ext = "js", _) {
   const _require = require;
 
   const isFunction = v => typeof v === "function";
@@ -119,34 +119,37 @@ function DM(ext = "js") {
     return sorted;
   };
 
+  /** 默认挂载函数 */
+  const plugin = (deps, name, main) => {
+    if (_.has(deps, name)) throw Error(`Name ${name} duplicate`);
+    _.set(deps, name, main);
+  };
   /**
    * 全流程自动加载一个目录下的所有模块
    * @param String dir 要加载的目录
-   * @param Set<string> ignores 要忽略的名称集合
-   * @param Object deps 执行后挂载的对象
-   * @param Array args 模块初始化传递的参数列表
-   * @param Object parent 模块挂载的对象
-   * @param Object defaults 默认模块 { [name]: Main }
+   * @param Set<string> opt.ignores 要忽略的名称集合
+   * @param Object opt.deps 目前已有的模块
+   * @param Array opt.args 模块初始化传递的参数列表
+   * @param Object opt.defaults 默认模块 { [name]: Main }
+   * @param Function opt.set 挂载函数 opt.set(deps, name, main)
    *
    * @return void
    */
-  const auto = (dir, ignores, deps, args, parent = deps, defaults = {}) => {
+  const auto = (dir, { ignores, deps, args, defaults }) => {
+    if (!defaults) defaults = {};
+
     const modules = loadDir(dir, ignores);
     for (const name of Object.keys(defaults)) {
       if (modules[name]) throw Error(`Name ${name} exists already`);
       modules[name] = defaults[name];
     }
     const names = sort(modules, new Set(Object.keys(deps)));
-    const plugin = (name, main) => {
-      if (parent[name]) throw Error(`Name ${name} duplicate`);
-      parent[name] = main;
-    };
     for (const x of names) {
       const { Alias } = modules[x];
       const main = exec(modules[x], args);
-      plugin(x, main);
+      plugin(deps, x, main);
       if (Array.isArray(Alias) && Alias.length) {
-        for (const as of Alias) plugin(as, main);
+        for (const as of Alias) plugin(deps, as, main);
       }
     }
   };
