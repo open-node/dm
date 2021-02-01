@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const Utils = require('./utils');
 
 /**
  * 初始化
@@ -9,6 +10,7 @@ const path = require("path");
  */
 function DM(ext = "js", _) {
   const _require = require;
+  const utils = Utils(_);
 
   const isFunction = v => typeof v === "function";
 
@@ -103,7 +105,7 @@ function DM(ext = "js", _) {
       // 那就要抛出异常了，说明依赖指定有问题，永远都不可能排序完毕
       let count = 0;
       /** 默认挂载函数 */
-      const plugin = (name) => {
+      const plugin = name => {
         const main = exec(modules[name], args);
         if (_.has(deps, name)) throw Error(`Name ${name} duplicate`);
         _.set(deps, name, main);
@@ -125,7 +127,7 @@ function DM(ext = "js", _) {
     }
   };
 
-  return { load, loadDir, exec, auto };
+  return { load, loadDir, exec, auto, utils };
 }
 
 module.exports = DM;
