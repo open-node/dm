@@ -98,6 +98,23 @@ describe("Dependency Injection Manager.", () => {
       expect(deps.three.sayHi()).toBe("hi from three");
     });
 
+    it("case1-incorrect", () => {
+      const dm = DM(_);
+      const deps = { one: "hello" };
+      expect(() => {
+        dm.auto(case1, deps, [{}, deps]);
+      }).toThrow("Name one duplicate");
+    });
+
+    it("case1-incorrect After isnot function", () => {
+      const dm = DM(_);
+      const deps = {};
+      case1.one.After = 1000;
+      expect(() => {
+        dm.auto(case1, deps, [{}, deps]);
+      }).toThrow("After must be a function");
+    });
+
     it("case2-incorrect", () => {
       const dm = DM(_);
       const deps = {};
