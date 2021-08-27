@@ -12,8 +12,8 @@ Dependency Injection Manager for Node.js
 const _ = require('lodash');
 const DM = require('@open-node/dm');
 
-const dm = DM('js', _);
+const dm = DM(_);
 
 const deps = {};
-dm.auto(dir, { ignores, deps, args });
+dm.auto(modules, deps, args);
 </pre>
