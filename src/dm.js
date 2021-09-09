@@ -16,7 +16,7 @@ function DM(_) {
       args = Main.Before(...args);
     }
     // 这里考虑兼容ts的模式，ts下不便于直接export一个函数，将主函数命名为 main export
-    const MainFn = Main.main || Main;
+    const MainFn = Main.Main || Main.main || Main;
     if (!_.isFunction(MainFn)) throw Error(`Main must be a function`);
     const main = MainFn(...args);
     if (Main.After) {
