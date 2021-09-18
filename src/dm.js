@@ -69,7 +69,7 @@ function DM(_) {
             )}`
           );
         }
-        throw Error(`Deps defined conflict, ${Array.from(names)}`);
+        throw Error(`Deps defined conflict, ${lacks.join(";")}`);
       }
     }
   };
