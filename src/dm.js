@@ -60,8 +60,17 @@ function DM(_) {
         if (Deps.every((d) => _.has(deps, d))) plugin(x);
       }
 
-      if (count === 0)
+      if (count === 0) {
+        const lacks = [];
+        for (const x of names) {
+          lacks.push(
+            `${x}: ${_.filter(modules[x].Deps, (d) => !_.has(deps, d)).join(
+              ","
+            )}`
+          );
+        }
         throw Error(`Deps defined conflict, ${Array.from(names)}`);
+      }
     }
   };
   return { exec, auto };
