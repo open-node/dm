@@ -8,7 +8,7 @@
     "build": "tsc",
     "test": "jest --coverage",
     "test:watch": "jest --watch src",
-    "release": "npm publish --registry=https://registry.npmjs.org --access=public",
+    "release": "npm run test && npm run build && npm publish --registry=https://registry.npmjs.org --access=public",
     "release:github": "npm publish --registry=https://npm.pkg.github.com/"
   },
   "pre-commit": [
