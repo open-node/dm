@@ -10,7 +10,7 @@ interface ModuleInterface {
 
 type ModuleFn = (((...args: any[]) => any) | {}) & ModuleInterface;
 
-type Merge<T extends {}, D extends { [k in string]: ModuleFn }> = T & {
+export type Merge<T extends {}, D extends { [k in string]: ModuleFn }> = T & {
   [K in keyof D]: ReturnType<
     D[K]["Main"] extends (...args: any) => any
       ? D[K]["Main"]
@@ -22,7 +22,7 @@ type Merge<T extends {}, D extends { [k in string]: ModuleFn }> = T & {
   >;
 };
 
-function DM(_: typeof lodash) {
+export function DM(_: typeof lodash) {
   function exec<
     MainFn extends (...args: ReturnType<BeforeFn>) => any,
     BeforeFn extends (...args: Args) => any[],
@@ -91,5 +91,3 @@ function DM(_: typeof lodash) {
 
   return { exec, auto };
 }
-
-export = DM;

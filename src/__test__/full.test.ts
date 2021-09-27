@@ -1,4 +1,4 @@
-import DM = require("../dm");
+import { DM } from "../dm";
 import _ = require("lodash");
 
 describe("dm unit test by typescript", () => {
