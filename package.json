@@ -1,6 +1,6 @@
 {
   "name": "@open-node/dm",
-  "version": "3.0.0",
+  "version": "3.0.0-alpha",
   "description": "Dependency Injection Manager for Node.js",
   "main": "dist/src/index.js",
   "scripts": {
