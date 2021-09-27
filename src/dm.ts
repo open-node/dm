@@ -10,6 +10,18 @@ interface ModuleInterface {
 
 type ModuleFn = (((...args: any[]) => any) | {}) & ModuleInterface;
 
+type Merge<T extends {}, D extends { [k in string]: ModuleFn }> = T & {
+  [K in keyof D]: ReturnType<
+    D[K]["Main"] extends (...args: any) => any
+      ? D[K]["Main"]
+      : D[K]["main"] extends (...args: any) => any
+      ? D[K]["main"]
+      : D[K] extends (...args: any) => any
+      ? D[K]
+      : (...args: any) => any
+  >;
+};
+
 function DM(_: typeof lodash) {
   function exec<
     MainFn extends (...args: ReturnType<BeforeFn>) => any,
@@ -73,6 +85,8 @@ function DM(_: typeof lodash) {
         throw Error(`Deps defined conflict, ${lacks.join(";")}`);
       }
     }
+
+    return deps as Merge<typeof deps, typeof modules>;
   }
 
   return { exec, auto };
