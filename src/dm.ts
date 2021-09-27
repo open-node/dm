@@ -5,18 +5,23 @@ interface ModuleInterface {
   main?: (...args: any[]) => any;
   Deps?: string[];
   Before?: (...args: any[]) => any;
-  After?: (...args: any[]) => any;
+  After?: (...args: any[]) => void;
 }
 
-type ModuleFn = (((...args: any[]) => any) | undefined) & ModuleInterface;
+type ModuleFn = (((...args: any[]) => any) | {}) & ModuleInterface;
 
 function DM(_: typeof lodash) {
   function exec<
     MainFn extends (...args: ReturnType<BeforeFn>) => any,
     BeforeFn extends (...args: Args) => any[],
-    AfterFn extends (main: ReturnType<MainFn>, ...args: ReturnType<BeforeFn>) => any,
+    AfterFn extends (main: ReturnType<MainFn>, ...args: ReturnType<BeforeFn>) => void,
     Args extends any[]
-  >(Main: MainFn, Before: BeforeFn, After: AfterFn, _args: Args): ReturnType<MainFn> {
+  >(
+    Main: MainFn,
+    Before: BeforeFn = ((...args: Args) => args) as unknown as BeforeFn,
+    After: AfterFn = ((...args: any[]) => {}) as unknown as AfterFn,
+    _args: Args = [] as unknown as Args
+  ): ReturnType<MainFn> {
     const args = Before(..._args);
     type BeforeReturnType = ReturnType<BeforeFn>;
     const main = Main(...(args as BeforeReturnType));
@@ -40,6 +45,7 @@ function DM(_: typeof lodash) {
       const plugin = (name: string) => {
         const Module = modules[name] as ModuleFn;
         const Main = Module.Main || Module.main || Module;
+        if (typeof Main !== "function") throw Error(`Main is not a function`);
         const Before = Module.Before || ((...args: any[]) => args);
         const After = Module.After || ((...args: any[]) => {});
 

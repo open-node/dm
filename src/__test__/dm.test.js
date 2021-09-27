@@ -1,9 +1,8 @@
 const _ = require("lodash");
-const DM = require("../dm");
+const DM = require("../dm.ts");
 const case1 = require("../../samples/case1");
 const case2 = require("../../samples/case2-incorrect");
 const case3 = require("../../samples/case3-incorrect");
-const case4 = require("../../samples/case4");
 const case5 = require("../../samples/case5-incorrect");
 const case6 = require("../../samples/case6-incorrect");
 
@@ -15,7 +14,7 @@ describe("Dependency Injection Manager.", () => {
       Main.mockReturnValueOnce({
         sayHi() {
           return "Hi";
-        },
+        }
       });
       const main = dm.exec(Main);
       expect(main.sayHi()).toBe("Hi");
@@ -26,18 +25,18 @@ describe("Dependency Injection Manager.", () => {
     it("case2, before hook only", () => {
       const dm = DM(_);
       const Main = jest.fn();
-      Main.Before = jest.fn();
+      const Before = jest.fn();
       Main.mockReturnValueOnce({
         sayHi() {
           return "Hi";
-        },
+        }
       });
-      Main.Before.mockReturnValueOnce([1, 2, 3]);
-      const main = dm.exec(Main);
+      Before.mockReturnValueOnce([1, 2, 3]);
+      const main = dm.exec(Main, Before);
       expect(main.sayHi()).toBe("Hi");
 
-      expect(Main.Before.mock.calls.length).toBe(1);
-      expect(Main.Before.mock.calls.pop()).toEqual([]);
+      expect(Before.mock.calls.length).toBe(1);
+      expect(Before.mock.calls.pop()).toEqual([]);
 
       expect(Main.mock.calls.length).toBe(1);
       expect(Main.mock.calls.pop()).toEqual([1, 2, 3]);
@@ -46,17 +45,17 @@ describe("Dependency Injection Manager.", () => {
     it("case3, after hook only", () => {
       const dm = DM(_);
       const Main = jest.fn();
-      Main.After = jest.fn();
+      const After = jest.fn();
       Main.mockReturnValueOnce({
         sayHi() {
           return "Hi";
-        },
+        }
       });
-      const main = dm.exec(Main);
+      const main = dm.exec(Main, undefined, After);
       expect(main.sayHi()).toBe("Hi");
 
-      expect(Main.After.mock.calls.length).toBe(1);
-      expect(Main.After.mock.calls.pop()).toEqual([main]);
+      expect(After.mock.calls.length).toBe(1);
+      expect(After.mock.calls.pop()).toEqual([main]);
 
       expect(Main.mock.calls.length).toBe(1);
       expect(Main.mock.calls.pop()).toEqual([]);
@@ -65,22 +64,22 @@ describe("Dependency Injection Manager.", () => {
     it("case4, before And after hook both exists", () => {
       const dm = DM(_);
       const Main = jest.fn();
-      Main.Before = jest.fn();
-      Main.After = jest.fn();
-      Main.Before.mockReturnValueOnce([1, 2, 3]);
+      const Before = jest.fn();
+      const After = jest.fn();
+      Before.mockReturnValueOnce([1, 2, 3]);
       Main.mockReturnValueOnce({
         sayHi() {
           return "Hi";
-        },
+        }
       });
-      const main = dm.exec(Main);
+      const main = dm.exec(Main, Before, After);
       expect(main.sayHi()).toBe("Hi");
 
-      expect(Main.Before.mock.calls.length).toBe(1);
-      expect(Main.Before.mock.calls.pop()).toEqual([]);
+      expect(Before.mock.calls.length).toBe(1);
+      expect(Before.mock.calls.pop()).toEqual([]);
 
-      expect(Main.After.mock.calls.length).toBe(1);
-      expect(Main.After.mock.calls.pop()).toEqual([main, 1, 2, 3]);
+      expect(After.mock.calls.length).toBe(1);
+      expect(After.mock.calls.pop()).toEqual([main, 1, 2, 3]);
 
       expect(Main.mock.calls.length).toBe(1);
       expect(Main.mock.calls.pop()).toEqual([1, 2, 3]);
@@ -112,7 +111,7 @@ describe("Dependency Injection Manager.", () => {
       case1.one.After = 1000;
       expect(() => {
         dm.auto(case1, deps, [{}, deps]);
-      }).toThrow("After must be a function");
+      }).toThrow("After is not a function");
     });
 
     it("case2-incorrect", () => {
@@ -136,7 +135,7 @@ describe("Dependency Injection Manager.", () => {
       const deps = {};
       expect(() => {
         dm.auto(case5, deps, [{}, deps]);
-      }).toThrow("Main must be a function");
+      }).toThrow("Main is not a function");
     });
 
     it("case7, module hooks must be funciton", () => {
@@ -144,7 +143,7 @@ describe("Dependency Injection Manager.", () => {
       const deps = {};
       expect(() => {
         dm.auto(case6, deps, [{}, deps]);
-      }).toThrow("Before must be a function");
+      }).toThrow("Before is not a function");
     });
   });
 });
