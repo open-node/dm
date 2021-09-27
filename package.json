@@ -1,8 +1,8 @@
 {
   "name": "@open-node/dm",
-  "version": "3.0.0-alpha",
+  "version": "3.0.0-alpha.2",
   "description": "Dependency Injection Manager for Node.js",
-  "main": "dist/src/index.js",
+  "main": "dist/dm.js",
   "scripts": {
     "lint": "eslint ./src/*",
     "build": "tsc",
