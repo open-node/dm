@@ -77,15 +77,30 @@ describe("dm unit test by typescript", () => {
 
   describe("auto", () => {
     it("case2.1", () => {
+      const test2 = Object.assign(
+        (name: string, gender: Gender, age: number) => {
+          return `Name: ${name}, Gender: ${gender}, Age: ${age} years.`;
+        },
+        {
+          Before: (name: string, gender: Gender): [string, Gender, number] => {
+            return [name, gender, 30];
+          }
+        }
+      );
       const modules = {
         profile: { Main, Before, After },
-        test1: { Main, Before, After }
+        test1: { Main, Before, After },
+        test2,
+        test3: { main: Main, Before, After }
       };
 
-      const { profile, test1 } = dm.auto(modules, {}, ["redstone", "male"]);
+      const deps = dm.auto(modules, {}, ["redstone", "male"]);
 
-      expect(profile.get()).toEqual({ name: "redstone Zhao", gender: "male" });
-      expect(test1.get()).toEqual({ name: "redstone Zhao", gender: "male" });
+      expect(deps.profile.get()).toEqual({ name: "redstone Zhao", gender: "male" });
+      expect(deps.test1.get()).toEqual({ name: "redstone Zhao", gender: "male" });
+      expect(deps.test2).toMatch("Age: 30 years");
+      console.log(deps.test2);
+      expect(deps.test3.get()).toEqual({ name: "redstone Zhao", gender: "male" });
     });
   });
 });
