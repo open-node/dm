@@ -31,6 +31,7 @@
   "homepage": "https://github.com/open-node/dm#readme",
   "devDependencies": {
     "@types/lodash": "^4.14.174",
+    "@types/jest": "^27.0.1",
     "codecov": "^3.8.3",
     "eslint": "^7.14.0",
     "eslint-config-airbnb": "^18.2.1",
