@@ -4,21 +4,34 @@ import _ = require("lodash");
 describe("exec", () => {
   const dm = DM(_);
   type Gender = "male" | "female";
-  const Main = jest.fn((name: string, gender: Gender) => {
+  interface MainInterface {
+    get: () => { name: string; gender: Gender };
+  }
+
+  const Main = jest.fn((name: string, gender: Gender): MainInterface => {
     const get = () => ({
       name,
       gender
     });
 
-    return { get };
+    return { get } as MainInterface;
   });
 
   const Before = jest.fn((name: string, gender: Gender): [string, Gender] => {
     return [name + " Zhao", gender];
   });
 
+  interface MainInterface {
+    print: () => string;
+  }
+
   const After = jest.fn((main: ReturnType<typeof Main>, name: String, gender: Gender) => {
-    console.log(main.get());
+    const print = () => {
+      const { name, gender } = main.get();
+      return `Name: ${name}, Gender: ${gender}`;
+    };
+
+    Object.assign(main, { print });
   });
 
   it("case1.1", () => {
@@ -50,5 +63,7 @@ describe("exec", () => {
     expect(Before.mock.results.pop()).toEqual({ type: "return", value: ["redstone Zhao", "male"] });
     expect(After.mock.calls.length).toBe(1);
     expect(After.mock.calls.pop()).toEqual([main, "redstone Zhao", "male"]);
+    console.log(main.print());
+    expect(main.print()).toMatch("redstone Zhao");
   });
 });
